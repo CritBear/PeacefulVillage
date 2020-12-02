@@ -87,18 +87,21 @@ def get_scenario():
             'image' : 'assets/HeavyInfantry.png',
             'size' : 2,
             'hp' : 100,
-            'speed' : 100 },
+            'damage' : 20,
+            'speed' : 30 },
         'LightInfantry' : {
             'image' : 'assets/LightInfantry.png',
             'size' : 1,
             'hp' : 100,
-            'speed' : 100,
+            'damage' : 20,
+            'speed' : 60,
             'range' : 128 },
         'Ranger' : {
             'image' : 'assets/Ranger.png',
             'size' : 1,
             'hp' : 100,
-            'speed' : 100,
+            'damage' : 20,
+            'speed' : 80,
             'range' : 192 }
         }
     settings['enemy_info'] = enemy_info

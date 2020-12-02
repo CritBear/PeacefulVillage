@@ -590,11 +590,16 @@ class Enemy(Actor):
         super(Enemy, self).__init__(settings['image'], position, scale=0.1*settings['size'])
         self.tag = 'enemy'
         self.hp = settings['hp']
+        self.damage = settings['damage']
         self.speed = settings['speed']
         self.dead = False
 
     def update_obj(self, dt):
         pass
+
+    def move(self, offset):
+        self.position += offset
+        self.cshape.center = eu.Vector2(self.position[0], self.position[1])
 
     def damaged(self, damage):
         self.hp -= damage
@@ -608,6 +613,11 @@ class Enemy(Actor):
                 other.dead = True
                 self.damaged(other.damage)
 
+        if isinstance(other, Structure):
+            if hasattr(other, 'damaged'):
+                other.damaged(self.damage)
+                self.move(self.velocity * -1)
+
 
 class HeavyInfantry(Enemy):
     def __init__(self, position, settings):
@@ -617,9 +627,9 @@ class HeavyInfantry(Enemy):
         radian = math.atan2(self.parent.centralBase.position[1] - self.position[1],
                             self.parent.centralBase.position[0] - self.position[0])
         self.velocity = eu.Vector2(math.cos(radian), math.sin(radian)).normalize() * self.speed
+
+        self.move(self.velocity * dt)
         
-        self.position += self.velocity * dt
-        self.cshape.center = eu.Vector2(self.position[0], self.position[1])
 
 
 class LightInfantry(Enemy):
@@ -627,7 +637,11 @@ class LightInfantry(Enemy):
         super(LightInfantry, self).__init__(position, settings)
 
     def update_obj(self, dt):
-        pass
+        radian = math.atan2(self.parent.centralBase.position[1] - self.position[1],
+                            self.parent.centralBase.position[0] - self.position[0])
+        self.velocity = eu.Vector2(math.cos(radian), math.sin(radian)).normalize() * self.speed
+        
+        self.move(self.velocity * dt)
 
 
 class Ranger(Enemy):
@@ -635,7 +649,11 @@ class Ranger(Enemy):
         super(Ranger, self).__init__(position, settings)
 
     def update_obj(self, dt):
-        pass
+        radian = math.atan2(self.parent.centralBase.position[1] - self.position[1],
+                            self.parent.centralBase.position[0] - self.position[0])
+        self.velocity = eu.Vector2(math.cos(radian), math.sin(radian)).normalize() * self.speed
+        
+        self.move(self.velocity * dt)
 
 class Bullet(Actor):
     def __init__(self, settings, shooter, position, rotation):
