@@ -48,7 +48,7 @@ class GameLayer(cocos.layer.Layer):
         self.spawn_delay = 0.5
         self.spawn_remaining_time = self.spawn_delay
         
-        self.init_hud()
+        self.hud.init_panel()
         self.init_startingStructure()
 
         self.mouse = Actors.Mouse(self.grid_size)
@@ -98,14 +98,14 @@ class GameLayer(cocos.layer.Layer):
         
         self.remaining_time -= dt
         if self.remaining_time < 0:
-            self.next_state()
+            self.next_stage()
 
         if self.stage >= len(GameLayer.scenario.stage_info) - 1:
             self.hud.update_remaining_time('Clear', round(self.remaining_time, 1))
         else:
             self.hud.update_remaining_time('Stage %s' % (self.stage + 1), round(self.remaining_time, 1))
 
-    def next_state(self):
+    def next_stage(self):
         if self.stage < len(GameLayer.scenario.stage_info) - 1:
                 self.stage += 1
                 self.remaining_time = GameLayer.scenario.stage_info[self.stage]['time']
@@ -128,10 +128,6 @@ class GameLayer(cocos.layer.Layer):
                 self.remove(obj)
 
 
-    def init_hud(self):
-        self.hud.init_resource_state()
-        self.hud.init_structure_menu_panel()
-        self.hud.init_structure_info_panel()
     
     def init_startingStructure(self):
         grid_pos = GameLayer.scenario.centralBase_position
@@ -310,29 +306,27 @@ class HUD(cocos.layer.Layer):
                        'structure_info' : None }
         self.current_structure = None
 
+    def init_panel(self):
+        self.init_state_panel()
+        self.init_structure_menu_panel()
+        self.init_structure_info_panel()
+    
     def init_state_panel(self):
         w, h = director.get_window_size()
-        self.copper_image = self._create_image('assets/copper.png', (w-240, h-40))
-        self.copper_amount = self._create_text((w-210, h-35), 18)
-        self.iron_image = self._create_image('assets/iron.png', (w-240, h-80))
-        self.iron_amount = self._create_text((w-210, h-75), 18)
-        self.titanium_image = self._create_image('assets/titanium.png', (w-240, h-120))
-        self.titanium_amount = self._create_text((w-210, h-115), 18)
+        state_panel = UI.Panel('assets/panel_300x300px.png', (w-160, h-160))
+        self.panel['state'] = state_panel
+        self.add(state_panel)
         
-        self.remaining_time = self._create_text((w-300, h-200), 16, contents='Until the Stage :')
-        self._create_button('assets/skip_button.png', (w-60, h-200), 'State_Skip_onClick', scale=0.2)
+        state_panel.copper_image = self._create_image('assets/copper.png', (w-240, h-60), parent=state_panel)
+        state_panel.copper_amount = self._create_text((w-210, h-55), 18, parent=state_panel)
+        state_panel.iron_image = self._create_image('assets/iron.png', (w-240, h-100), parent=state_panel)
+        state_panel.iron_amount = self._create_text((w-210, h-95), 18, parent=state_panel)
+        state_panel.titanium_image = self._create_image('assets/titanium.png', (w-240, h-140), parent=state_panel)
+        state_panel.titanium_amount = self._create_text((w-210, h-135), 18, parent=state_panel)
         
-    def init_resource_state(self):
-        w, h = director.get_window_size()
-        self.copper_image = self._create_image('assets/copper.png', (w-240, h-40))
-        self.copper_amount = self._create_text((w-210, h-35), 18)
-        self.iron_image = self._create_image('assets/iron.png', (w-240, h-80))
-        self.iron_amount = self._create_text((w-210, h-75), 18)
-        self.titanium_image = self._create_image('assets/titanium.png', (w-240, h-120))
-        self.titanium_amount = self._create_text((w-210, h-115), 18)
+        state_panel.remaining_time = self._create_text((w-300, h-220), 16, contents='Until the Stage :', parent=state_panel)
+        state_panel.skip_button = self._create_button('assets/skip_button.png', (w-60, h-220), 'State_Skip_onClick', parent=state_panel, scale=0.2)
         
-        self.remaining_time = self._create_text((w-300, h-200), 16, contents='Until the Stage :')
-        self._create_button('assets/skip_button.png', (w-60, h-200), 'State_Skip_onClick', scale=0.2)
 
     def init_structure_menu_panel(self):
         w, h = director.get_window_size()
@@ -375,14 +369,18 @@ class HUD(cocos.layer.Layer):
         info_panel.storage = []
         for i in range(5):
             info_panel.storage.append(self._create_text((w-220, 380 - i * 20), 14, contents='', parent=info_panel))
-        
+
+        self._create_text((w-280, 100), 18, contents='Mouse Right Button', parent=info_panel)
+        self._create_text((w-280, 60), 24, contents='-> Cancel', parent=info_panel)
+
         
         # Supply Base
-        info_panel.send_button = self._create_button('assets/send_button.png', (w-220, 200), 'Info_SendButton_onClick', info_panel, 0.2)
-        info_panel.receive_button = self._create_button('assets/receive_button.png', (w-100, 200), 'Info_ReceiveButton_onClick', info_panel, 0.2)
-        info_panel.copper_button = self._create_button('assets/copper.png', (w-120, 120), 'Info_copper_onClick', info_panel, 1)
-        info_panel.iron_button = self._create_button('assets/iron.png', (w-160, 120), 'Info_iron_onClick', info_panel, 1)
-        info_panel.titanium_button = self._create_button('assets/titanium.png', (w-200, 120), 'Info_titanium_onClick', info_panel, 1)
+        info_panel.send_button = self._create_button('assets/send_button.png', (w-220, 240), 'Info_SendButton_onClick', info_panel, 0.2)
+        info_panel.receive_button = self._create_button('assets/receive_button.png', (w-100, 240), 'Info_ReceiveButton_onClick', info_panel, 0.2)
+        info_panel.copper_button = self._create_button('assets/copper.png', (w-120, 160), 'Info_copper_onClick', info_panel, 1)
+        info_panel.iron_button = self._create_button('assets/iron.png', (w-160, 160), 'Info_iron_onClick', info_panel, 1)
+        info_panel.titanium_button = self._create_button('assets/titanium.png', (w-200, 160), 'Info_titanium_onClick', info_panel, 1)
+
         
         info_panel.enable(False)
 
@@ -436,7 +434,7 @@ class HUD(cocos.layer.Layer):
                 index += 1
 
     def update_remaining_time(self, stage, time):
-        self.remaining_time.element.text = 'Until the %s... %s' % (stage, time)
+        self.panel['state'].remaining_time.element.text = 'Until the %s... %s' % (stage, time)
             
 
     def _create_button(self, img, pos, event, parent=None, scale=1):
@@ -461,9 +459,9 @@ class HUD(cocos.layer.Layer):
         return text
 
     def update_resource(self, storage):
-        self.copper_amount.element.text = 'Copper: %s' % storage['copper']
-        self.iron_amount.element.text = 'Iron: %s' % storage['iron']
-        self.titanium_amount.element.text = 'Titanium: %s' % storage['titanium']
+        self.panel['state'].copper_amount.element.text = 'Copper: %s' % storage['copper']
+        self.panel['state'].iron_amount.element.text = 'Iron: %s' % storage['iron']
+        self.panel['state'].titanium_amount.element.text = 'Titanium: %s' % storage['titanium']
 
 
 def new_game():
