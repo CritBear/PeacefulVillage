@@ -375,7 +375,8 @@ class AmmoPlant(Structure):
         self.cshape.center = eu.Vector2(self.position[0], self.position[1])
         self.capacity = 10
         self.storage = { 'copper' : 0,
-                         'CrudeBullet' : 0 }
+                         'BasicBullet' : 0,
+                         'CannonBullet' : 0 }
 
     def update_obj(self, dt):
         pass
@@ -449,13 +450,16 @@ class CrudeTower(Tower):
     def shoot(self):
         if self.target_pos is None:
             return
-        if self.storage['BasicBullet'] > 0:
-            return
 
-        if self.storage['copper'] > 0:
-            self.storage['copper'] -= 1
+        if self.storage['BasicBullet'] >= 1:
+            self.storage['BasicBullet'] -= 1
             offset_rotation = (random.random() - 0.5) * 10
             self.parent.add(BasicBullet('player', self.position, self.rotation + offset_rotation))
+
+        if self.storage['copper'] >= 3:
+            self.storage['copper'] -= 1
+            offset_rotation = (random.random() - 0.5) * 10
+            self.parent.add(CrudeBullet('player', self.position, self.rotation + offset_rotation))
 
     def set_target(self):
         self.target_pos = None
