@@ -86,7 +86,7 @@ def get_scenario():
         'HeavyInfantry' : {
             'image' : 'assets/HeavyInfantry.png',
             'size' : 2,
-            'hp' : 100,
+            'hp' : 300,
             'damage' : 20,
             'speed' : 30 },
         'LightInfantry' : {
@@ -101,7 +101,7 @@ def get_scenario():
             'size' : 1,
             'hp' : 100,
             'damage' : 20,
-            'speed' : 80,
+            'speed' : 40,
             'range' : 192 }
         }
     settings['enemy_info'] = enemy_info
@@ -127,13 +127,13 @@ def get_scenario():
 
     stage_info = [
         { 'time' : 60,
-          'enemy' : { 'HeavyInfantry' : 0,
-                      'LightInfantry' : 0,
+          'enemy' : { 'HeavyInfantry' : 5,
+                      'LightInfantry' : 10,
                       'Ranger' : 0 } },
         { 'time' : 30,
-          'enemy' : { 'HeavyInfantry' : 2,
+          'enemy' : { 'HeavyInfantry' : 0,
                       'LightInfantry' : 0,
-                      'Ranger' : 0 } },
+                      'Ranger' : 5 } },
         { 'time' : 30,
           'enemy' : { 'HeavyInfantry' : 5,
                       'LightInfantry' : 0,

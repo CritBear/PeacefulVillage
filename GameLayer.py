@@ -92,9 +92,9 @@ class GameLayer(cocos.layer.Layer):
                 if enemy_type == 'HeavyInfantry':
                     self.add(Actors.HeavyInfantry(self.get_enemy_spawn_pos(), GameLayer.scenario.enemy_info['HeavyInfantry']))
                 elif enemy_type == 'LightInfantry':
-                    self.add(Actors.LightInfantry(self.get_enemy_spawn_pos(), GameLayer.scenario.enemy_info['HeavyInfantry']))
+                    self.add(Actors.LightInfantry(self.get_enemy_spawn_pos(), GameLayer.scenario.enemy_info['LightInfantry']))
                 elif enemy_type == 'Ranger':
-                    self.add(Actors.Ranger(self.get_enemy_spawn_pos(), GameLayer.scenario.enemy_info['HeavyInfantry']))
+                    self.add(Actors.Ranger(self.get_enemy_spawn_pos(), GameLayer.scenario.enemy_info['Ranger']))
         
         self.remaining_time -= dt
         if self.remaining_time < 0:
@@ -230,6 +230,10 @@ class GameLayer(cocos.layer.Layer):
             self.hud.current_structure.set_transporting_resource('iron')
         elif event == 'Info_titanium_onClick':
             self.hud.current_structure.set_transporting_resource('titanium')
+        elif event == 'Info_BasicBullet_onClick':
+            self.hud.current_structure.set_transporting_resource('BasicBullet')
+        elif event == 'Info_CannonBullet_onClick':
+            self.hud.current_structure.set_transporting_resource('CannonBullet')
 
             
     def place_structure(self, structure, real_pos, grid_pos):
@@ -377,9 +381,11 @@ class HUD(cocos.layer.Layer):
         # Supply Base
         info_panel.send_button = self._create_button('assets/send_button.png', (w-220, 240), 'Info_SendButton_onClick', info_panel, 0.2)
         info_panel.receive_button = self._create_button('assets/receive_button.png', (w-100, 240), 'Info_ReceiveButton_onClick', info_panel, 0.2)
-        info_panel.copper_button = self._create_button('assets/copper.png', (w-120, 160), 'Info_copper_onClick', info_panel, 1)
-        info_panel.iron_button = self._create_button('assets/iron.png', (w-160, 160), 'Info_iron_onClick', info_panel, 1)
-        info_panel.titanium_button = self._create_button('assets/titanium.png', (w-200, 160), 'Info_titanium_onClick', info_panel, 1)
+        info_panel.copper_button = self._create_button('assets/copper.png', (w-240, 160), 'Info_copper_onClick', info_panel, 1)
+        info_panel.iron_button = self._create_button('assets/iron.png', (w-200, 160), 'Info_iron_onClick', info_panel, 1)
+        info_panel.titanium_button = self._create_button('assets/titanium.png', (w-160, 160), 'Info_titanium_onClick', info_panel, 1)
+        info_panel.basicBullet_button = self._create_button('assets/BasicBullet.png', (w-120, 160), 'Info_BasicBullet_onClick', info_panel, 0.7)
+        info_panel.cannonBullet_button = self._create_button('assets/CannonBullet.png', (w-80, 160), 'Info_CannonBullet_onClick', info_panel, 0.7)
 
         
         info_panel.enable(False)
@@ -417,6 +423,8 @@ class HUD(cocos.layer.Layer):
             panel.copper_button.enable(False)
             panel.iron_button.enable(False)
             panel.titanium_button.enable(False)
+            panel.basicBullet_button.enable(False)
+            panel.cannonBullet_button.enable(False)
             
 
     
@@ -462,6 +470,9 @@ class HUD(cocos.layer.Layer):
         self.panel['state'].copper_amount.element.text = 'Copper: %s' % storage['copper']
         self.panel['state'].iron_amount.element.text = 'Iron: %s' % storage['iron']
         self.panel['state'].titanium_amount.element.text = 'Titanium: %s' % storage['titanium']
+
+
+
 
 
 def new_game():

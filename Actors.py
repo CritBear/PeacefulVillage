@@ -199,7 +199,9 @@ class Warehouse(Structure):
         self.capacity = 200
         self.storage = { 'copper' : 0,
                          'iron' : 0,
-                         'titanium' : 0 }
+                         'titanium' : 0,
+                         'BasicBullet' : 0,
+                         'CannonBullet' : 0 }
 
         self.isOpen = False
         self.distribute_delay = 20
@@ -213,20 +215,43 @@ class Warehouse(Structure):
             self.distribute_count += 1
 
     def distribute(self):
-        if self.storage['copper'] <= 0:
-            return False
-        
         for obj in self.parent.get_children():
             if hasattr(obj, 'receive'):
                 if isinstance(obj, Warehouse):
                     continue
                 if mt.distance(self.position, obj.position) > self.range:
                     continue
-                if obj.receive('copper'):
-                    self.storage['copper'] -= 1
-                    self.parent.add(SimpleActionActor('assets/copper.png', self.position,
-                                                      ac.FadeIn(0.5) | ac.MoveTo(obj.position, 1),
-                                                      opacity=0))
+
+                if self.storage['copper'] >= 1:
+                    if obj.receive('copper'):
+                        self.storage['copper'] -= 1
+                        self.parent.add(SimpleActionActor('assets/copper.png', self.position,
+                                                          ac.FadeIn(0.5) | ac.MoveTo(obj.position, 1),
+                                                          opacity=0))
+                if self.storage['iron'] >= 1:
+                    if obj.receive('iron'):
+                        self.storage['iron'] -= 1
+                        self.parent.add(SimpleActionActor('assets/iron.png', self.position,
+                                                          ac.FadeIn(0.5) | ac.MoveTo(obj.position, 1),
+                                                          opacity=0))
+                if self.storage['titanium'] >= 1:
+                    if obj.receive('titanium'):
+                        self.storage['titanium'] -= 1
+                        self.parent.add(SimpleActionActor('assets/titanium.png', self.position,
+                                                          ac.FadeIn(0.5) | ac.MoveTo(obj.position, 1),
+                                                          opacity=0))
+                if self.storage['BasicBullet'] >= 1:
+                    if obj.receive('BasicBullet'):
+                        self.storage['BasicBullet'] -= 1
+                        self.parent.add(SimpleActionActor('assets/BasicBullet.png', self.position,
+                                                          ac.FadeIn(0.5) | ac.MoveTo(obj.position, 1),
+                                                          opacity=0))
+                if self.storage['CannonBullet'] >= 1:
+                    if obj.receive('CannonBullet'):
+                        self.storage['CannonBullet'] -= 1
+                        self.parent.add(SimpleActionActor('assets/CannonBullet.png', self.position,
+                                                          ac.FadeIn(0.5) | ac.MoveTo(obj.position, 1),
+                                                          opacity=0))
 
     def send(self, resource):
         if self.storage[resource] <= 0:
@@ -258,7 +283,7 @@ class SupplyBase(Structure):
         self.send_structure = None
         self.transporting_resource = None
         self.tempStorage = 0
-        self.transport_delay = 5
+        self.transport_delay = 12
         self.transport_count = 0
 
     def update_obj(self, dt):
@@ -373,19 +398,55 @@ class AmmoPlant(Structure):
         self.tag = 'AmmoPlant'
         self.cshape = cm.AARectShape(self.position, self.width * 0.5, self.height * 0.5)
         self.cshape.center = eu.Vector2(self.position[0], self.position[1])
-        self.capacity = 10
+        self.capacity = 200
         self.storage = { 'copper' : 0,
+                         'iron' : 0,
+                         'titanium' : 0,
                          'BasicBullet' : 0,
                          'CannonBullet' : 0 }
+        self.produce_delay = 10
+        self.produce_count = 0
+        self.distribute_delay = 20
+        self.distribute_count = 0
 
     def update_obj(self, dt):
-        pass
+        if self.produce_count > self.produce_delay:
+            self.produce_count = 0
+            self.produce()
+        else:
+            self.produce_count += 1
+
+        if self.distribute_count > self.distribute_delay:
+            self.distribute_count = 0
+            self.distribute()
+        else:
+            self.distribute_count += 1
 
     def distribute(self):
-        pass
+        for obj in self.parent.get_children():
+            if hasattr(obj, 'receive'):
+                if mt.distance(self.position, obj.position) > self.range:
+                    continue
+
+                    if obj.receive('BasicBullet'):
+                        self.storage['BasicBullet'] -= 1
+                        self.parent.add(SimpleActionActor('assets/BasicBullet.png', self.position,
+                                                          ac.FadeIn(0.5) | ac.MoveTo(obj.position, 1),
+                                                          opacity=0))
+                if self.storage['CannonBullet'] >= 1:
+                    if obj.receive('CannonBullet'):
+                        self.storage['CannonBullet'] -= 1
+                        self.parent.add(SimpleActionActor('assets/CannonBullet.png', self.position,
+                                                          ac.FadeIn(0.5) | ac.MoveTo(obj.position, 1),
+                                                          opacity=0))
 
     def produce(self):
-        pass
+        if self.storage['copper'] >= 1:
+            self.storage['copper'] -= 1
+            self.storage['BasicBullet'] += 1
+        if self.storage['iron'] >= 1:
+            self.storage['iron'] -= 1
+            self.storage['CannonBullet'] += 1
 
     def send(self, resource):
         if self.storage[resource] <= 0:
@@ -600,6 +661,8 @@ class Enemy(Actor):
         self.damage = settings['damage']
         self.speed = settings['speed']
         self.dead = False
+        if 'range' in settings:
+            self.range = settings['range']
 
     def update_obj(self, dt):
         pass
@@ -654,13 +717,51 @@ class LightInfantry(Enemy):
 class Ranger(Enemy):
     def __init__(self, position, settings):
         super(Ranger, self).__init__(position, settings)
+        self.target_pos = None;
+        self.shoot_delay = 20
+        self.shoot_count = 0
 
     def update_obj(self, dt):
-        radian = math.atan2(self.parent.centralBase.position[1] - self.position[1],
-                            self.parent.centralBase.position[0] - self.position[0])
+        self.set_target()
+        radian = math.atan2(self.target_pos[1] - self.position[1],
+                            self.target_pos[0] - self.position[0])
         self.velocity = eu.Vector2(math.cos(radian), math.sin(radian)).normalize() * self.speed
-        
         self.move(self.velocity * dt)
+
+        if self.shoot_count > self.shoot_delay:
+            self.shoot_count = 0
+            self.shoot()
+        else:
+            self.shoot_count += 1
+        
+    def set_target(self):
+        self.target_pos = None
+        minDistance = 9999
+        for obj in self.parent.get_children():
+            if isinstance(obj, MiningBase) or isinstance(obj, Warehouse) or isinstance(obj, SupplyBase) or isinstance(obj, AmmoPlant):
+                distance = mt.distance(self.position, obj.position)
+                if minDistance > distance:
+                    self.target_pos = obj.position
+                    minDistance = distance
+                    self.rotation = mt.get_angle(self.position, self.target_pos)
+        if self.target_pos is None:
+            for obj in self.parent.get_children():
+                if isinstance(obj, Structure):
+                    distance = mt.distance(self.position, obj.position)
+                    if minDistance > distance:
+                        self.target_pos = obj.position
+                        minDistance = distance
+                        self.rotation = mt.get_angle(self.position, self.target_pos)
+
+    def shoot(self):
+        if self.target_pos is None:
+            return
+
+        if self.range > mt.distance(self.position, self.target_pos):
+            offset_rotation = (random.random() - 0.5) * 10
+            self.parent.add(CrudeBullet('enemy', self.position, self.rotation + offset_rotation))
+            
+        
 
 class Bullet(Actor):
     def __init__(self, settings, shooter, position, rotation):
