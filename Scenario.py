@@ -35,7 +35,7 @@ def get_scenario():
         'Warehouse' : {
             'image' : 'assets/Warehouse.png',
             'size' : 1,
-            'cost' : { 'copper' : 10, 'iron' : 10, 'titanium' : 0 },
+            'cost' : { 'copper' : 30, 'iron' : 0, 'titanium' : 0 },
             'range' : 160,
             'hp' : 100 },
         'SupplyBase' : {
@@ -47,19 +47,19 @@ def get_scenario():
         'MiningBase' : {
             'image' : 'assets/MiningBase.png',
             'size' : 1,
-            'cost' : { 'copper' : 10, 'iron' : 10, 'titanium' : 0 },
+            'cost' : { 'copper' : 20, 'iron' : 0, 'titanium' : 0 },
             'range' : 160,
             'hp' : 100 },
         'AmmoPlant' : {
             'image' : 'assets/AmmoPlant.png',
             'size' : 1,
-            'cost' : { 'copper' : 10, 'iron' : 10, 'titanium' : 0 },
+            'cost' : { 'copper' : 50, 'iron' : 30, 'titanium' : 0 },
             'range' : 160,
             'hp' : 100 },
         'IronWall' : {
             'image' : 'assets/IronWall.png',
             'size' : 1,
-            'cost' : { 'copper' : 10, 'iron' : 120, 'titanium' : 0 },
+            'cost' : { 'copper' : 30, 'iron' : 50, 'titanium' : 0 },
             'hp' : 800 },
         'CrudeTower' : {
             'image' : 'assets/CrudeTower.png',
@@ -86,23 +86,23 @@ def get_scenario():
         'HeavyInfantry' : {
             'image' : 'assets/HeavyInfantry.png',
             'size' : 2,
-            'hp' : 300,
+            'hp' : 100,
             'damage' : 20,
             'speed' : 30 },
         'LightInfantry' : {
             'image' : 'assets/LightInfantry.png',
             'size' : 1,
-            'hp' : 100,
+            'hp' : 60,
             'damage' : 20,
             'speed' : 60,
             'range' : 128 },
         'Ranger' : {
             'image' : 'assets/Ranger.png',
             'size' : 1,
-            'hp' : 100,
+            'hp' : 60,
             'damage' : 20,
             'speed' : 40,
-            'range' : 192 }
+            'range' : 120 }
         }
     settings['enemy_info'] = enemy_info
 
@@ -127,31 +127,47 @@ def get_scenario():
 
     stage_info = [
         { 'time' : 60,
-          'enemy' : { 'HeavyInfantry' : 5,
-                      'LightInfantry' : 10,
-                      'Ranger' : 0 } },
-        { 'time' : 30,
           'enemy' : { 'HeavyInfantry' : 0,
                       'LightInfantry' : 0,
-                      'Ranger' : 5 } },
-        { 'time' : 30,
+                      'Ranger' : 0 } },
+        { 'time' : 60,
+          'enemy' : { 'HeavyInfantry' : 1,
+                      'LightInfantry' : 3,
+                      'Ranger' : 0 } },
+        { 'time' : 60,
+          'enemy' : { 'HeavyInfantry' : 2,
+                      'LightInfantry' : 5,
+                      'Ranger' : 0 } },
+        { 'time' : 60,
+          'enemy' : { 'HeavyInfantry' : 4,
+                      'LightInfantry' : 6,
+                      'Ranger' : 2 } },
+        { 'time' : 60,
           'enemy' : { 'HeavyInfantry' : 5,
-                      'LightInfantry' : 0,
-                      'Ranger' : 0 } },
-        { 'time' : 30,
-          'enemy' : { 'HeavyInfantry' : 8,
-                      'LightInfantry' : 0,
-                      'Ranger' : 0 } },
-        { 'time' : 30,
+                      'LightInfantry' : 10,
+                      'Ranger' : 5 } },
+        { 'time' : 60,
+          'enemy' : { 'HeavyInfantry' : 10,
+                      'LightInfantry' : 18,
+                      'Ranger' : 10 } },
+        { 'time' : 60,
           'enemy' : { 'HeavyInfantry' : 15,
-                      'LightInfantry' : 0,
-                      'Ranger' : 0 } }
+                      'LightInfantry' : 20,
+                      'Ranger' : 10 } },
+        { 'time' : 60,
+          'enemy' : { 'HeavyInfantry' : 20,
+                      'LightInfantry' : 30,
+                      'Ranger' : 20 } },
+        { 'time' : 60,
+          'enemy' : { 'HeavyInfantry' : 20,
+                      'LightInfantry' : 30,
+                      'Ranger' : 20 } }
         ]
     settings['stage_info'] = stage_info
     
     resource_position = { 'copper' : [(0, 4), (11, 3), (12, 4), (25, 12), (4, 15), (4, 16), (6, 16), (10, 26), (14, 23)],
-                          'iron' : [(0, 2), (19, 2), (20, 2), (20, 3), (1, 12), (11, 19)],
-                          'titanium' : [(0, 0), (17, 17), (22, 20)] }
+                          'iron' : [(19, 2), (20, 2), (20, 3), (1, 12), (11, 19)],
+                          'titanium' : [(17, 17), (22, 20)] }
     settings['resource_position'] = resource_position
     
     centralBase_position = (3, 2)

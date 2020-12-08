@@ -56,7 +56,9 @@ class GameLayer(cocos.layer.Layer):
         
         self.schedule(self.update_obj)
 
-
+    def game_over(self):
+        director.replace(SplitColsTransition(game_over()))
+        
     def update_obj(self, dt):
         self.update_map()
         for obj in self.get_children():
@@ -482,10 +484,30 @@ def new_game():
     gameLayer = GameLayer(hud, scenario)
     return cocos.scene.Scene(background, gameLayer, hud)
 
-def game_over():
+def clear():
+    w, h = director.get_window_size()
     layer = cocos.layer.Layer()
+    text = cocos.text.Label('Clear', position=(w*0.5, h*0.5),
+                            font_name='Oswald', font_size=72,
+                            anchor_x='center', anchor_y='center')
+    
+    layer.add(text)
     scene = cocos.scene.Scene(layer)
-    new_scene = FadeTransition(mainmenu.new_menu())
+    new_scene = FadeTransition(MainMenu.new_menu())
+    func = lambda: director.replace(new_scene)
+    scene.do(ac.Delay(3) + ac.CallFunc(func))
+    return scene
+
+def game_over():
+    w, h = director.get_window_size()
+    layer = cocos.layer.Layer()
+    text = cocos.text.Label('Game Over', position=(w*0.5, h*0.5),
+                            font_name='Oswald', font_size=72,
+                            anchor_x='center', anchor_y='center')
+    
+    layer.add(text)
+    scene = cocos.scene.Scene(layer)
+    new_scene = FadeTransition(MainMenu.new_menu())
     func = lambda: director.replace(new_scene)
     scene.do(ac.Delay(3) + ac.CallFunc(func))
     return scene

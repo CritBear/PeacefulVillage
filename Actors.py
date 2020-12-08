@@ -143,11 +143,15 @@ class CentralBase(Structure):
         self.cshape.center = eu.Vector2(self.position[0], self.position[1])
         self.capacity = 1000
         self.storage = { 'copper' : 200,
-                         'iron' : 200,
-                         'titanium' : 100 }
+                         'iron' : 70,
+                         'titanium' : 0 }
         self.hud.update_resource(self.storage)
 
-        
+    def damaged(self, damage):
+        self.hp -= damage
+        if self.hp <= 0:
+            self.parent.game_over()
+    
     def update_obj(self, dt):
         pass
 
@@ -344,7 +348,7 @@ class MiningBase(Structure):
         self.storage = { miningResource : 0 }
         self.distribute_delay = 20
         self.distribute_count = 0
-        self.mine_delay = 30
+        self.mine_delay = 20
         self.mine_count = 0
 
     def update_obj(self, dt):
@@ -519,8 +523,8 @@ class CrudeTower(Tower):
             offset_position = mt.rotate_vector2(self.shoot_pos_offset, self.rotation)
             self.parent.add(BasicBullet('player', self.position + offset_position, self.rotation + offset_rotation))
 
-        if self.storage['copper'] >= 3:
-            self.storage['copper'] -= 3
+        if self.storage['copper'] >= 2:
+            self.storage['copper'] -= 2
             offset_rotation = (random.random() - 0.5) * 10
             offset_position = mt.rotate_vector2(self.shoot_pos_offset, self.rotation)
             self.parent.add(CrudeBullet('player', self.position + offset_position, self.rotation + offset_rotation))
