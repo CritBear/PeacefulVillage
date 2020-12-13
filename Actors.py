@@ -5,8 +5,9 @@ import cocos.actions as ac
 import cocos.euclid as eu
 import cocos.collision_model as cm
 
-import pyglet.image
-from pyglet.image import Animation
+import pyglet
+#import pyglet.image
+#from pyglet.image import Animation
 
 import math
 import random
@@ -19,6 +20,7 @@ class Actor(cocos.sprite.Sprite):
         super(Actor, self).__init__(img, position, scale=scale, rotation=rotation)
         self.cshape = cm.CircleShape(self.position, self.width * 0.5)
         self.cshape.center = eu.Vector2(self.position[0], self.position[1])
+        self.isDead = False
         
     '''
     @property
@@ -122,6 +124,9 @@ class Structure(Actor):
     def damaged(self, damage):
         self.hp -= damage
         if self.hp <= 0:
+            sound_destruct = pyglet.resource.media('assets/sound/block_crush.wav', streaming=False)
+            sound_destruct.play()
+            self.isDead = True
             self.kill()
     
     def collide(self, other):
@@ -150,6 +155,7 @@ class CentralBase(Structure):
     def damaged(self, damage):
         self.hp -= damage
         if self.hp <= 0:
+            self.parent.bgmPlayer.delete()
             self.parent.game_over()
     
     def update_obj(self, dt):
@@ -299,6 +305,8 @@ class SupplyBase(Structure):
 
     def transport(self):
         if self.receive_structure is None or self.send_structure is None or self.transporting_resource is None:
+            return
+        if self.receive_structure.isDead or self.send_structure.isDead:
             return
         if self.transporting_resource not in self.send_structure.storage.keys():
             return

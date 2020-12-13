@@ -7,6 +7,8 @@ import cocos.actions as ac
 import cocos.collision_model as cm
 import cocos.euclid as eu
 
+import pyglet
+
 import MainMenu
 import Actors
 import UI
@@ -53,6 +55,16 @@ class GameLayer(cocos.layer.Layer):
 
         self.mouse = Actors.Mouse(self.grid_size)
         self.add(self.mouse)
+
+        bgm_source = pyglet.media.load('assets/sound/bgm_main.mp3')
+        self.bgmPlayer = pyglet.media.Player()
+        self.bgmPlayer.queue(bgm_source)
+        self.bgmPlayer.play()
+
+        
+        self.sound_construct = pyglet.resource.media('assets/sound/block_const.wav')
+        self.sound_click = pyglet.resource.media('assets/sound/button_click.wav')
+        
         
         self.schedule(self.update_obj)
 
@@ -239,6 +251,7 @@ class GameLayer(cocos.layer.Layer):
 
             
     def place_structure(self, structure, real_pos, grid_pos):
+        state = False
         size = GameLayer.scenario.structure_info[structure]['size']
         for x in range(grid_pos[0] - math.floor((size-1)/2), grid_pos[0] + math.ceil((size-1)/2) + 1):
             if x < 0 or x >= GameLayer.map_width:
@@ -259,30 +272,32 @@ class GameLayer(cocos.layer.Layer):
             for resource in GameLayer.scenario.resource_position:
                 if grid_pos in GameLayer.scenario.resource_position[resource]:
                     self.add(Actors.MiningBase(real_pos, GameLayer.scenario.structure_info[structure], resource))
-                    return True
-            print('Place Fail(MiningBase) : There is no resource')
+                    state = True
         elif structure == 'SupplyBase':
             self.add(Actors.SupplyBase(real_pos, GameLayer.scenario.structure_info[structure]))
-            return True
+            state = True
         elif structure == 'Warehouse':
             self.add(Actors.Warehouse(real_pos, GameLayer.scenario.structure_info[structure]))
-            return True
+            state = True
         elif structure == 'AmmoPlant':
             self.add(Actors.AmmoPlant(real_pos, GameLayer.scenario.structure_info[structure]))
-            return True
+            state = True
         elif structure == 'IronWall':
             self.add(Actors.IronWall(real_pos, GameLayer.scenario.structure_info[structure]))
-            return True
+            state = True
         elif structure == 'CrudeTower':
             self.add(Actors.CrudeTower(real_pos, GameLayer.scenario.structure_info[structure]))
-            return True
+            state = True
         elif structure == 'BasicTower':
             self.add(Actors.BasicTower(real_pos, GameLayer.scenario.structure_info[structure]))
-            return True
+            state = True
         elif structure == 'CannonTower':
             self.add(Actors.CannonTower(real_pos, GameLayer.scenario.structure_info[structure]))
+            state = True
+
+        if state is True:
+            self.sound_construct.play()
             return True
-        
         return False
 
     
